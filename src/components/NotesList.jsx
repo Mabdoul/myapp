@@ -1,5 +1,6 @@
-import axios from "axios";
 import React, { useEffect, useState } from "react";
+import axios from "axios";
+import "./NotesListDark.css"; // Import the dark theme CSS
 
 function NotesList() {
     const [notes, setNotes] = useState([]);
@@ -8,14 +9,17 @@ function NotesList() {
     const [editingNote, setEditingNote] = useState(null);
     const [editTitle, setEditTitle] = useState("");
     const [editContent, setEditContent] = useState("");
+    const [newNoteTitle, setNewNoteTitle] = useState("");
+    const [newNoteContent, setNewNoteContent] = useState("");
+    const [showAddNoteForm, setShowAddNoteForm] = useState(false); // State to toggle the add note form
 
     useEffect(() => {
         fetchNotes();
         const storedName = localStorage.getItem("first");
-        const storedlast = localStorage.getItem("last");
-        if (storedName && storedlast) {
+        const storedLast = localStorage.getItem("last");
+        if (storedName && storedLast) {
             setUserName(storedName);
-            setLast(storedlast);
+            setLast(storedLast);
         }
     }, []);
 
@@ -34,6 +38,29 @@ function NotesList() {
         }
     };
 
+    const addNewNote = async (e) => {
+        e.preventDefault();
+        try {
+            const token = localStorage.getItem("token");
+            const resp = await axios.post(
+                "https://notes.devlop.tech/api/notes",
+                { title: newNoteTitle, content: newNoteContent },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            setNotes([...notes, resp.data]);
+            setNewNoteTitle("");
+            setNewNoteContent("");
+            setShowAddNoteForm(false); // Hide the form after adding the note
+        } catch (err) {
+            console.error("Error adding note:", err.response ? err.response.data : err.message);
+            alert("Failed to add the note. Please try again.");
+        }
+    };
+
     const delet = async (noteId) => {
         try {
             const token = localStorage.getItem('token');
@@ -43,7 +70,6 @@ function NotesList() {
                 }
             });
             setNotes((prevNotes) => prevNotes.filter((note) => note.id !== noteId));
-        
         } catch (err) {
             console.error("Error deleting note:", err.response ? err.response.data : err.message);
             alert("Failed to delete the note. Please try again.");
@@ -67,7 +93,7 @@ function NotesList() {
                     note.id === noteId ? { ...note, ...updatedData } : note
                 )
             );
-         
+            setEditingNote(null);
         } catch (err) {
             console.error("Error updating note:", err.response ? err.response.data : err.message);
             alert("Failed to update the note. Please try again.");
@@ -75,107 +101,123 @@ function NotesList() {
     };
 
     return (
-        <div className="container mt-5 ">
-            <h1 className="text-center mb-4">Notes List</h1>
-            <h4>Welcome, {userName} {userLast}</h4> 
-            <div className="mb-3 d-flex justify-content-between">
-                <button className="btn btn-danger" onClick={()=>{
-                    alert('Hatin tochkan sber ka')
-                }}>Log Out</button>
-
-                <button className="btn btn-success" onClick={()=>{
-                    alert('Hatin tochkan sber ka')
-                }}>Add New Note</button>
+        <div className="notes-dark-container">
+            <div className="notes-header">
+                <h1>Notes List</h1>
+                <h4>Welcome, {userName} {userLast}</h4>
+                <div className="header-buttons">
+                    <button className="btn logout-btn" onClick={() => alert('Logged out')}>
+                        Log Out
+                    </button>
+                </div>
             </div>
+
+            <div className="header-buttons">
+                <button
+                    className="btn add-note-btn"
+                    onClick={() => setShowAddNoteForm(!showAddNoteForm)}
+                >
+                    {showAddNoteForm ? "Cancel" : "Add Note"}
+                </button>
+            </div>
+
+            {showAddNoteForm && (
+                <div className="add-note-form">
+                    <form onSubmit={addNewNote}>
+                        <input
+                            type="text"
+                            placeholder="New Note Title"
+                            value={newNoteTitle}
+                            onChange={(e) => setNewNoteTitle(e.target.value)}
+                            required
+                        />
+                        <textarea
+                            placeholder="New Note Content"
+                            value={newNoteContent}
+                            onChange={(e) => setNewNoteContent(e.target.value)}
+                            required
+                        />
+                        <button type="submit" className="btn add-note-btn">
+                            Add Note
+                        </button>
+                    </form>
+                </div>
+            )}
+
             {notes.length > 0 ? (
-                <table className="table table-striped table-bordered">
-                    <thead className="table-dark">
+                <table className="notes-table">
+                    <thead>
                         <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Title</th>
-                            <th scope="col">Content</th>
-                            <th>Events</th>
+                            <th>#</th>
+                            <th>Title</th>
+                            <th>Content</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {notes.map((note, index) => (
-                            <>
-                                <tr key={index}>
-                                    <th scope="row">{index + 1}</th>
-                                    <td>{note.title}</td>
-                                    <td>{note.content}</td>
-                                    <td>
-                                        <div className="d-flex justify-content-start gap-1">
-                                            <button
-                                                className="btn btn-success mr-2"
-                                                onClick={() => {
-                                                    setEditingNote(note);
-                                                    setEditTitle(note.title);
-                                                    setEditContent(note.content);
-                                                }}
-                                            >
-                                                Update
-                                            </button>
-                                            <button
-                                                className="btn btn-danger"
-                                                onClick={() => delet(note.id)}
-                                            >
-                                                Delete
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                {editingNote && editingNote.id === note.id && (
-                                    <tr>
-                                        <td colSpan="4">
-                                            <form
-                                                onSubmit={(e) => {
-                                                    e.preventDefault();
-                                                    updateNote(editingNote.id, { title: editTitle, content: editContent });
-                                                    setEditingNote(null);
-                                                }}
-                                            >
-                                                <div className="mb-3">
-                                                    <label htmlFor="editTitle" className="form-label">Title</label>
-                                                    <input
-                                                        type="text"
-                                                        id="editTitle"
-                                                        className="form-control"
-                                                        value={editTitle}
-                                                        onChange={(e) => setEditTitle(e.target.value)}
-                                                    />
-                                                </div>
-                                                <div className="mb-3">
-                                                    <label htmlFor="editContent" className="form-label">Content</label>
-                                                    <textarea
-                                                        id="editContent"
-                                                        className="form-control"
-                                                        value={editContent}
-                                                        onChange={(e) => setEditContent(e.target.value)}
-                                                    />
-                                                </div>
-                                                <div className="d-flex justify-content-start gap-2">
-                                                    <button type="submit" className="btn btn-primary">Save</button>
-                                                    <button
-                                                        type="button"
-                                                        className="btn btn-secondary"
-                                                        onClick={() => setEditingNote(null)}
-                                                    >
-                                                        Cancel
-                                                    </button>
-                                                </div>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                )}
-                            </>
+                            <tr key={index}>
+                                <td>{index + 1}</td>
+                                <td>{note.title}</td>
+                                <td>{note.content}</td>
+                                <td className="actions">
+                                    <button
+                                        className="btn update-btn"
+                                        onClick={() => {
+                                            setEditingNote(note);
+                                            setEditTitle(note.title);
+                                            setEditContent(note.content);
+                                        }}
+                                    >
+                                        Update
+                                    </button>
+                                    <button
+                                        className="btn delete-btn"
+                                        onClick={() => delet(note.id)}
+                                    >
+                                        Delete
+                                    </button>
+                                </td>
+                            </tr>
                         ))}
                     </tbody>
                 </table>
             ) : (
-                <p className="text-center text-muted">No notes available.</p>
+                <p className="no-notes">No notes available.</p>
             )}
 
+            {editingNote && (
+                <div className="edit-form-container">
+                    <form
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            updateNote(editingNote.id, { title: editTitle, content: editContent });
+                        }}
+                    >
+                        <input
+                            type="text"
+                            value={editTitle}
+                            onChange={(e) => setEditTitle(e.target.value)}
+                            placeholder="Edit Title"
+                            required
+                        />
+                        <textarea
+                            value={editContent}
+                            onChange={(e) => setEditContent(e.target.value)}
+                            placeholder="Edit Content"
+                            required
+                        />
+                        <button type="submit" className="btn save-btn">Save</button>
+                        <button
+                            type="button"
+                            className="btn cancel-btn"
+                            onClick={() => setEditingNote(null)}
+                        >
+                            Cancel
+                        </button>
+                    </form>
+                </div>
+            )}
         </div>
     );
 }

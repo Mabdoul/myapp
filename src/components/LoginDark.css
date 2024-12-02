@@ -1,0 +1,74 @@
+/* Center the login container with a dark background */
+.login-dark-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #121212; /* Dark background */
+  color: #ffffff; /* Light text color */
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Style the login card */
+.login-dark-card {
+  background-color: #1e1e1e; /* Slightly lighter dark background */
+  border-radius: 10px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /* Subtle shadow for depth */
+}
+
+/* Form labels */
+.form-label {
+  color: #ffffff; /* Keep labels readable */
+}
+
+/* Form inputs */
+.form-control {
+  background-color: #2a2a2a; /* Dark input background */
+  border: 1px solid #444444; /* Subtle border */
+  color: #ffffff; /* Light text color */
+  border-radius: 5px;
+  padding: 0.75rem;
+  font-size: 1rem;
+}
+
+.form-control::placeholder {
+  color: #888888; /* Placeholder text */
+}
+
+/* Input focus */
+.form-control:focus {
+  border-color: #6c63ff; /* Highlight color */
+  box-shadow: 0 0 5px rgba(108, 99, 255, 0.5);
+}
+
+/* Button styling */
+.btn-primary {
+  background-color: #6c63ff;
+  border: none;
+  transition: all 0.3s ease;
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background-color: #4c48da;
+  transform: scale(1.05);
+}
+
+/* Link styling */
+a {
+  color: #6c63ff;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+a:hover {
+  color: #4c48da;
+}
+
+/* Text alignment */
+.text-center {
+  color: #ffffff;
+}
