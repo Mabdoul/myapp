@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import "./NotesListDark.css"; // Import the dark theme CSS
+import "./NotesListDark.css"; 
 
 function NotesList() {
     const [notes, setNotes] = useState([]);
@@ -11,7 +11,7 @@ function NotesList() {
     const [editContent, setEditContent] = useState("");
     const [newNoteTitle, setNewNoteTitle] = useState("");
     const [newNoteContent, setNewNoteContent] = useState("");
-    const [showAddNoteForm, setShowAddNoteForm] = useState(false); // State to toggle the add note form
+    const [showAddNoteForm, setShowAddNoteForm] = useState(false); 
 
     useEffect(() => {
         fetchNotes();
@@ -54,7 +54,7 @@ function NotesList() {
             setNotes([...notes, resp.data]);
             setNewNoteTitle("");
             setNewNoteContent("");
-            setShowAddNoteForm(false); // Hide the form after adding the note
+            setShowAddNoteForm(false); 
         } catch (err) {
             console.error("Error adding note:", err.response ? err.response.data : err.message);
             alert("Failed to add the note. Please try again.");

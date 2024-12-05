@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import "./LoginDark.css"; // Import your custom CSS for the dark theme.
+import "./LoginDark.css";
 
 function Login(props) {
     const [cin, setCin] = useState("");
